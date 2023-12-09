@@ -26,14 +26,14 @@ public class GraphQLResource {
     @Query("allOrders")
     @Description("Get all orders placed in the current day")
     public List<OrderRecord> allOrders(@Name("name") String name, @Name("menuItem")MenuItem menuItem, @Name("orderStatus") OrderStatus orderStatus, @Name("paymentStats") PaymentStatus paymentStatus) {
-        return orderService.orderQuery(Optional.ofNullable(name), Optional.ofNullable(menuItem), Optional.ofNullable(orderStatus), Optional.ofNullable(paymentStatus));
+        return orderService.orderQuery(
+                new OrderParams.Builder()
+                .withName(name)
+                .withMenuItem(menuItem)
+                .withOrderStatus(orderStatus)
+                .withPaymentStatus(paymentStatus)
+                .build());
     }
-
-//    @Query("orderForIndividual")
-//    @Description("Get all orders for a name")
-//    public List<OrderRecord> ordersForIndividual(@Name("name") String name) {
-//        return orderService.ordersForName(name);
-//    }
 
     @Mutation("placeOrder")
     @Description("Add a new order")

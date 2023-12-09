@@ -1,6 +1,7 @@
 package io.arrogantprogrammer;
 
 import io.arrogantprogrammer.domain.*;
+import io.arrogantprogrammer.graphql.OrderParams;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -59,41 +60,13 @@ public class OrderService {
         return orderRecord;
     }
 
-    public List<OrderRecord> orderQuery(Optional<String> name, Optional<MenuItem> menuItem, Optional<OrderStatus> orderStatus, Optional<PaymentStatus> paymentStatus) {
-        Map<String, Object> params = new HashMap<>();
-        if (name.isPresent()) {
-            params.put("name", name.get());
-        }
-        if (menuItem.isPresent()) {
-            params.put("menuItem", menuItem.get());
-        }
-        if (orderStatus.isPresent()) {
-            params.put("orderStatus", orderStatus.get());
-        }
-        if (paymentStatus.isPresent()) {
-            params.put("paymentStatus", paymentStatus.get());
-        }
-        if (params.isEmpty()) {
-            return allOrders();
-        }else {
-            StringBuilder sb = new StringBuilder();
-            params.keySet().forEach(k -> {
-                if (sb.length() > 1) {
-                    sb.append("and ");
-                    sb.append(k);
-                    sb.append(" = :");
-                    sb.append(k);
-                }else {
-                    sb.append(k);
-                    sb.append(" = :");
-                    sb.append(k);
-                }
-            });
-            String query = sb.toString();
-            LOGGER.debug("query: {}", query);
-            return orderRepository.find(query, params).stream().map(order -> {
+    public List<OrderRecord> orderQuery(OrderParams orderParams) {
+        if (orderParams.hasParams()) {
+            return orderRepository.find(orderParams.toQueryString(), orderParams.toMap()).stream().map(order -> {
                 return new OrderRecord(order.getName(), order.getMenuItem(), order.getOrderStatus(), order.getPaymentStatus(), order.getId());
             }).toList();
+        }else{
+            return allOrders();
         }
     }
 }
