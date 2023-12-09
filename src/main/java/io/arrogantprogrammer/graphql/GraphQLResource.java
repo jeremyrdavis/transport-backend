@@ -2,6 +2,9 @@ package io.arrogantprogrammer.graphql;
 
 import io.arrogantprogrammer.OrderService;
 import io.arrogantprogrammer.domain.*;
+import io.smallrye.graphql.api.Subscription;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.graphql.*;
@@ -16,6 +19,8 @@ import java.util.Optional;
 public class GraphQLResource {
 
     static final Logger LOGGER = LoggerFactory.getLogger(GraphQLResource.class);
+
+    BroadcastProcessor<OrderRecord> broadcastProcessor = BroadcastProcessor.create();
 
     @Inject
     OrderRepository orderRepository;
@@ -38,7 +43,14 @@ public class GraphQLResource {
     @Mutation("placeOrder")
     @Description("Add a new order")
     public OrderRecord placeOrder(OrderCommand orderCommand){
-        return orderService.createOrder(orderCommand);
+        OrderRecord orderRecord = orderService.createOrder(orderCommand);
+        broadcastProcessor.onNext(orderRecord);
+        return orderRecord;
     }
 
+    @Subscription
+    @Description("In progress orders")
+    public Multi<OrderRecord> inProgressOrders() {
+        return broadcastProcessor;
+    }
 }
