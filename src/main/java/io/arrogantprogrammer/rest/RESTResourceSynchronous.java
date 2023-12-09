@@ -21,14 +21,14 @@ public class RESTResourceSynchronous {
     @POST
     public OrderRecord placeOrder(OrderCommand orderCommand) {
         LOGGER.debug("Received order for {}.", orderCommand);
-        OrderRecord orderRecord = OrderService.createOrder(orderCommand);
+        OrderRecord orderRecord = orderService.createOrder(orderCommand);
         return orderRecord;
     }
 
     @PUT
     public OrderRecord updateOrder(UpdateOrderCommand updateOrderCommand) {
         LOGGER.debug("Received order for {}.", updateOrderCommand);
-        OrderRecord orderRecord = OrderService.updateOrder(updateOrderCommand);
+        OrderRecord orderRecord = orderService.updateOrder(updateOrderCommand);
         return orderRecord;
     }
 

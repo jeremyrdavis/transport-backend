@@ -1,20 +1,15 @@
 package io.arrogantprogrammer.graphql;
 
 import io.arrogantprogrammer.OrderService;
-import io.arrogantprogrammer.domain.Order;
-import io.arrogantprogrammer.domain.OrderCommand;
-import io.arrogantprogrammer.domain.OrderRecord;
-import io.arrogantprogrammer.domain.OrderRepository;
+import io.arrogantprogrammer.domain.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.graphql.Description;
-import org.eclipse.microprofile.graphql.GraphQLApi;
-import org.eclipse.microprofile.graphql.Mutation;
-import org.eclipse.microprofile.graphql.Query;
+import org.eclipse.microprofile.graphql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 @GraphQLApi
 @ApplicationScoped
@@ -30,11 +25,15 @@ public class GraphQLResource {
 
     @Query("allOrders")
     @Description("Get all orders placed in the current day")
-    public List<OrderRecord> getAllFilms() {
-        return orderRepository.listAll().stream().map(order -> {
-            return new OrderRecord(order.getName(), order.getMenuItem(), order.getOrderStatus(), order.getPaymentStatus(), order.getId());
-        }).toList();
+    public List<OrderRecord> allOrders(@Name("name") String name, @Name("menuItem")MenuItem menuItem, @Name("orderStatus") OrderStatus orderStatus, @Name("paymentStats") PaymentStatus paymentStatus) {
+        return orderService.orderQuery(Optional.ofNullable(name), Optional.ofNullable(menuItem), Optional.ofNullable(orderStatus), Optional.ofNullable(paymentStatus));
     }
+
+//    @Query("orderForIndividual")
+//    @Description("Get all orders for a name")
+//    public List<OrderRecord> ordersForIndividual(@Name("name") String name) {
+//        return orderService.ordersForName(name);
+//    }
 
     @Mutation("placeOrder")
     @Description("Add a new order")
