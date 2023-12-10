@@ -8,7 +8,7 @@ package grpcserviceproto;
 
 service gRPCService {
     rpc PlaceOrder (PlaceOrderProto) returns (OrderRecordProto) {}
-    rpc AllOrders (Empty) returns (stream OrderRecordProto) {}
+    rpc AllOrders (Empty) returns (AllOrderRecordsProto) {}
     rpc InProgressOrders (Empty) returns (stream OrderRecordProto) {}
 }
 
@@ -17,6 +17,10 @@ message Empty {}
 message PlaceOrderProto {
     string order_name = 1;
     MenuItemProto menu_item = 2;
+}
+
+message AllOrderRecordsProto {
+    repeated OrderRecordProto order_records = 1;
 }
 
 message OrderRecordProto {

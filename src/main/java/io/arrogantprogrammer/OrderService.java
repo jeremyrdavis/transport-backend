@@ -2,17 +2,16 @@ package io.arrogantprogrammer;
 
 import io.arrogantprogrammer.domain.*;
 import io.arrogantprogrammer.graphql.OrderParams;
+import io.smallrye.common.annotation.RunOnVirtualThread;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @ApplicationScoped
 public class OrderService {
@@ -24,9 +23,15 @@ public class OrderService {
 
     public List<OrderRecord> allOrders() {
         return orderRepository.listAll().stream().map(order -> {
+            LOGGER.debug("allOrders");
             return new OrderRecord(order.getName(), order.getMenuItem(), order.getOrderStatus(), order.getPaymentStatus(), order.getId());
         }).toList();
     }
+
+    public Uni<List<OrderRecord>> allOrdersMutiny() {
+        return Uni.createFrom().item(allOrders());
+    }
+
     @Transactional
     public OrderRecord createOrder(OrderCommand orderCommand) {
         LOGGER.debug("Received order for {}.", orderCommand);
