@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +28,13 @@ public class GRPCResource implements io.arrogantprogrammer.proto.gRPCService {
     EventBus eventBus;
 
 
-    @Override
+    @Override @Transactional
     public Uni<OrderRecordProto> placeOrder(PlaceOrderProto request) {
 
         OrderCommand orderCommand = new OrderCommand(request.getOrderName(), MenuItem.values()[request.getMenuItemValue()]);
         LOGGER.debug("placing order {}", orderCommand);
 
-        return Uni.createFrom().item(orderService.createOrder(orderCommand))
+        return  orderService.createOrderMutiny(orderCommand)
                 .onItem().transform(orderRecord -> OrderRecordProto.newBuilder()
                             .setName(orderRecord.name())
                             .setId(orderRecord.id().intValue())
@@ -41,10 +42,10 @@ public class GRPCResource implements io.arrogantprogrammer.proto.gRPCService {
                             .setOrderStatusValue(orderRecord.orderStatus().ordinal())
                             .setPaymentStatusValue(orderRecord.paymentStatus().ordinal())
                             .build())
-                        .invoke(orderRecordProto -> {
-                            eventBus.publish("order", orderRecordProto);
-                        })
-                        .map(orderRecordProto -> orderRecordProto);
+                .invoke(orderRecordProto -> {
+                    eventBus.publish("order", orderRecordProto);
+                })
+                .map(orderRecordProto -> orderRecordProto);
 
     }
 

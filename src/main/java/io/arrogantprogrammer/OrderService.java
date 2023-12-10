@@ -2,6 +2,7 @@ package io.arrogantprogrammer;
 
 import io.arrogantprogrammer.domain.*;
 import io.arrogantprogrammer.graphql.OrderParams;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,11 @@ public class OrderService {
         order.persist();
         LOGGER.debug("persisted order {}.", order);
         return new OrderRecord(order.getName(), order.getMenuItem(), order.getOrderStatus(), order.getPaymentStatus(), order.getId());
+    }
+
+    @Transactional
+    public Uni<OrderRecord> createOrderMutiny(OrderCommand orderCommand) {
+        return Uni.createFrom().item(createOrder(orderCommand));
     }
 
     @Transactional
