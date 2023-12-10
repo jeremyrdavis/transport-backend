@@ -19,6 +19,11 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 @GrpcService
 public class GRPCResource implements io.arrogantprogrammer.proto.gRPCService {
 
@@ -54,31 +59,17 @@ public class GRPCResource implements io.arrogantprogrammer.proto.gRPCService {
 
     @Override @RunOnVirtualThread
     public Uni<AllOrderRecordsProto> allOrders(Empty request) {
-        return orderService.allOrdersMutiny().map(orderRecords -> {
-           return AllOrderRecordsProto.newBuilder().addAllOrderRecords(orderRecords.stream().map(orderRecord -> {
-               return OrderRecordProto.newBuilder()
-                       .setName(orderRecord.name())
-                       .setId(orderRecord.id().intValue())
-                       .setMenuItemValue(orderRecord.menuItem().ordinal())
-                       .setOrderStatusValue(orderRecord.orderStatus().ordinal())
-                       .setPaymentStatusValue(orderRecord.paymentStatus().ordinal())
-                       .build();
-           }).toList()).build();
-        });
-//                Uni.createFrom().item(orderService.allOrders())
-//                .map(orderRecords -> {
-//                    AllOrderRecordsProto.Builder allOrderRecordsProtoBuilder = AllOrderRecordsProto.newBuilder();
-//                    orderRecords.stream().forEach(orderRecord -> {
-//                        allOrderRecordsProtoBuilder.addOrderRecords(OrderRecordProto.newBuilder()
-//                                .setName(orderRecord.name())
-//                                .setId(orderRecord.id().intValue())
-//                                .setMenuItemValue(orderRecord.menuItem().ordinal())
-//                                .setOrderStatusValue(orderRecord.orderStatus().ordinal())
-//                                .setPaymentStatusValue(orderRecord.paymentStatus().ordinal())
-//                                .build());
-//                    });
-//                    return allOrderRecordsProtoBuilder.build();
-//                });
+
+        List<OrderRecordProto> orderRecordProtos = orderService.allOrders().stream().map(orderRecord -> {
+            return OrderRecordProto.newBuilder()
+                    .setName(orderRecord.name())
+                    .setId(orderRecord.id().intValue())
+                    .setMenuItemValue(orderRecord.menuItem().ordinal())
+                    .setOrderStatusValue(orderRecord.orderStatus().ordinal())
+                    .setPaymentStatusValue(orderRecord.paymentStatus().ordinal())
+                    .build();
+        }).collect(toList());
+        return Uni.createFrom().item(AllOrderRecordsProto.newBuilder().addAllOrderRecords(orderRecordProtos).build());
     }
 
     @ConsumeEvent

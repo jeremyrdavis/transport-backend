@@ -23,7 +23,7 @@ public class OrderService {
 
     public List<OrderRecord> allOrders() {
         return orderRepository.listAll().stream().map(order -> {
-            LOGGER.debug("allOrders");
+            LOGGER.debug("order {} retrieved from db.", order);
             return new OrderRecord(order.getName(), order.getMenuItem(), order.getOrderStatus(), order.getPaymentStatus(), order.getId());
         }).toList();
     }

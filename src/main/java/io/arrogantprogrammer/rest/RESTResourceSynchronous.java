@@ -10,6 +10,8 @@ import jakarta.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 @Path("/rest-synchronous")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,6 +32,11 @@ public class RESTResourceSynchronous {
         LOGGER.debug("Received order for {}.", updateOrderCommand);
         OrderRecord orderRecord = orderService.updateOrder(updateOrderCommand);
         return orderRecord;
+    }
+
+    @GET
+    public List<OrderRecord> allOrders() {
+        return orderService.allOrders();
     }
 
 }
