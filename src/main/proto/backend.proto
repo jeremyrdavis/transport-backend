@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.arrogantprogrammer.proto";
+option java_outer_classname = "gRPCServiceProto";
+
+package grpcserviceproto;
+
+service gRPCService {
+    rpc PlaceOrder (PlaceOrderProto) returns (OrderRecordProto) {}
+    rpc AllOrders (Empty) returns (stream OrderRecordProto) {}
+    rpc InProgressOrders (Empty) returns (stream OrderRecordProto) {}
+}
+
+message Empty {}
+
+message PlaceOrderProto {
+    string order_name = 1;
+    MenuItemProto menu_item = 2;
+}
+
+message OrderRecordProto {
+  string name = 1;
+  MenuItemProto menu_item = 3;
+  OrderStatusProto order_status = 4;
+  PaymentStatusProto payment_status = 5;
+  int32 id = 6;
+}
+
+enum MenuItemProto {
+    SMALL_COFFEE = 0;
+    MEDIUM_COFFEE = 1;
+    LARGE_COFFEE = 2;
+    CAPPUCCINO = 3;
+    ESPRESSO = 4;
+    LATTE = 5;
+    TEA = 6;
+}
+
+enum OrderStatusProto {
+    ORDER_PLACED = 0;
+    ORDER_ACCEPTED = 1;
+    ORDER_READY = 2;
+    ORDER_DELIVERED = 3;
+}
+
+enum PaymentStatusProto {
+    PAYMENT_PENDING = 0;
+    PAYMENT_SUCCESS = 1;
+    PAYMENT_FAILED = 2;
+}
+
