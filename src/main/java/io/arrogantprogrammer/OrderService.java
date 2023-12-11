@@ -2,9 +2,7 @@ package io.arrogantprogrammer;
 
 import io.arrogantprogrammer.domain.*;
 import io.arrogantprogrammer.graphql.OrderParams;
-import io.smallrye.common.annotation.RunOnVirtualThread;
 import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.infrastructure.Infrastructure;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
