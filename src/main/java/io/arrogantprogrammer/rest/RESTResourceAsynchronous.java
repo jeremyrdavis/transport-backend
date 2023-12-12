@@ -2,6 +2,7 @@ package io.arrogantprogrammer.rest;
 
 import io.arrogantprogrammer.OrderService;
 import io.arrogantprogrammer.domain.OrderCommand;
+import io.arrogantprogrammer.domain.OrderRecord;
 import io.arrogantprogrammer.domain.UpdateOrderCommand;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
@@ -28,7 +29,7 @@ public class RESTResourceAsynchronous {
     @PUT
     public Response updateOrder(UpdateOrderCommand updateOrderCommand) {
         LOGGER.debug("Received order for {}.", updateOrderCommand);
-        OrderService.updateOrderAsync(updateOrderCommand);
-        return Response.accepted().build();
+        OrderRecord orderRecord = orderService.updateOrder(updateOrderCommand);
+        return Response.ok().entity(orderRecord).build();
     }
 }
